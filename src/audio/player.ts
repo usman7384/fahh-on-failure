@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import * as fs from "node:fs";
+import { execFile } from "node:child_process";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const playerFactory = require("play-sound");
@@ -20,6 +21,37 @@ export class AudioPlayer {
     this.outputChannel?.appendLine(msg);
   }
 
+  private playWindowsSound(): Promise<void> {
+    // Use a hidden PowerShell process to play the wav via .NET without
+    // triggering Windows' file association UI (e.g., Windows Media Player).
+    const escapedPath = this.soundPath.replace(/'/g, "''");
+    const script = [
+      "$ErrorActionPreference = 'Stop'",
+      `$p = '${escapedPath}'`,
+      "$sp = New-Object System.Media.SoundPlayer $p",
+      "$sp.Load()",
+      "$sp.PlaySync()",
+    ].join("; ");
+
+    const encoded = Buffer.from(script, "utf16le").toString("base64");
+
+    return new Promise<void>((resolve, reject) => {
+      execFile(
+        "powershell.exe",
+        [
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-EncodedCommand",
+          encoded,
+        ],
+        { windowsHide: true },
+        (err: Error | null) => (err ? reject(err) : resolve()),
+      );
+    });
+  }
+
   async playFahh(volume: number): Promise<void> {
     if (this.isPlaying) return;
     if (!fs.existsSync(this.soundPath)) {
@@ -29,6 +61,11 @@ export class AudioPlayer {
 
     this.isPlaying = true;
     try {
+      if (process.platform === "win32") {
+        await this.playWindowsSound();
+        return;
+      }
+
       await new Promise<void>((resolve, reject) => {
         const opts: Record<string, string[]> = {
           afplay: ["-v", String(Math.max(0, Math.min(1, volume)))],

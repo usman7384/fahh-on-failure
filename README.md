@@ -42,6 +42,8 @@ code --install-extension fahh-on-failure-1.0.0.vsix
 | Linux | `aplay` / `paplay` / `mpg123` | ❌ |
 | Windows | PowerShell `SoundPlayer` | ❌ |
 
+On Windows, audio playback uses a hidden PowerShell process via .NET `System.Media.SoundPlayer` to avoid launching your default `.wav` app (e.g., Windows Media Player).
+
 Linux may need: `sudo apt install alsa-utils`
 
 ## Try It
