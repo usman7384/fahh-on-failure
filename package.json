@@ -1,0 +1,91 @@
+{
+  "name": "fahh-on-failure",
+  "displayName": "Fahh on Failure",
+  "description": "Plays the viral \"fahh\" meme sound whenever your code fails. Because suffering should be audible.",
+  "version": "1.0.0",
+  "publisher": "fahh",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "fun",
+    "meme",
+    "sound",
+    "error",
+    "terminal",
+    "fahh"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "fahh.toggleMute",
+        "title": "Fahh: Toggle Mute"
+      }
+    ],
+    "configuration": {
+      "title": "Fahh on Failure",
+      "properties": {
+        "fahh.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable the Fahh on Failure extension."
+        },
+        "fahh.cooldownMs": {
+          "type": "number",
+          "default": 3000,
+          "minimum": 500,
+          "description": "Minimum time (in milliseconds) between consecutive sound plays. Prevents spam."
+        },
+        "fahh.volume": {
+          "type": "number",
+          "default": 0.6,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Playback volume (0.0 to 1.0). Volume control is currently supported on macOS only."
+        },
+        "fahh.sensitivity": {
+          "type": "string",
+          "default": "balanced",
+          "enum": [
+            "strict",
+            "balanced",
+            "chaos"
+          ],
+          "enumDescriptions": [
+            "Only trigger on non-zero exit codes.",
+            "Trigger on exit codes and well-known error patterns (default).",
+            "Trigger on any error-like text or red ANSI output. Maximum chaos."
+          ],
+          "description": "How aggressively to detect errors in terminal output."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "tsc --noEmit",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "play-sound": "^1.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.93.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/fahh-on-failure.git"
+}
+}
